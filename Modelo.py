@@ -1,11 +1,9 @@
-# El grado de eco-Puntuacion va desde 0 hasta 4, donde 0 es un bajo impacto ecologico
-# y 4 es un alto impacto ecologico, se debe hacer un modelo que clasifique correctamente cada producto
-# de Danone en una de estas 4 categorias.
 import json
 import numpy as np
+import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.utils import to_categorical
+from keras.layers import Conv2D, Flatten, Dense
+import matplotlib.pyplot as plt
 
 # Leer los datos preprocesados desde el archivo JSON
 with open('preprocessed_train_data.json', 'r') as file:
@@ -24,21 +22,44 @@ timesteps = X_train.shape[1]
 with open('etiquetas_entrenamiento.json', 'r') as file:
     labels = json.load(file)
 
-# Convertir las etiquetas en un arreglo numpy
+# Convertir las etiquetas en un arreglo numpy resultados esperados
 y_train = np.array(labels)
+
+# Reshape los datos de entrada para que tengan la forma adecuada para Conv2D
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
+
+# Convertir las etiquetas en formato one-hot encoding
+y_train = tf.keras.utils.to_categorical(y_train, num_classes=5)
+
 
 # Definir el modelo
 model = Sequential()
-model.add(LSTM(64, input_shape=(timesteps,15)))  # Capa LSTM en lugar de Dense
-model.add(Dense(128, activation='sigmoid'))
-model.add(Dense(256, activation='sigmoid'))
-model.add(Dense(1, activation='sigmoid'))
+model.add(Conv2D(64, kernel_size=3, padding="same", activation="relu", input_shape=(X_train.shape[1], X_train.shape[2], 1)))
+model.add(Flatten())
+model.add(Dense(128, activation="tanh"))
+model.add(Dense(5, activation="softmax"))
+
 
 # Compilar el modelo
-model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
+model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mean_squared_error', metrics=['accuracy'])
 
 # Entrenar el modelo
-model.fit(X_train, y_train, epochs=2000, batch_size=64)
+history = model.fit(X_train, y_train, epochs=100, batch_size=64)
+
+# Obtener las métricas de entrenamiento
+accuracy = history.history['accuracy']
+loss = history.history['loss']
+
+# Crear la gráfica
+epochs = range(1, len(accuracy) + 1)
+
+plt.plot(epochs, accuracy, 'b', label='Precisión de entrenamiento')
+plt.plot(epochs, loss, 'r', label='Pérdida de entrenamiento')
+plt.title('Precisión y Pérdida de entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión / Pérdida')
+plt.legend()
+plt.show()
 
 # Guardar el modelo entrenado
 model.save('trained_model.h5')

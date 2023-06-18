@@ -32,7 +32,7 @@ n = 0
 
 for i in range(num_instances):
     instance = {
-        str(n): int(predictions[i].item())
+        str(n): int(predictions[i][0])
     }
     n = n + 1
     output.update(instance)
