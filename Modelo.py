@@ -6,7 +6,7 @@ from keras.layers import Conv2D, Flatten, Dense
 import matplotlib.pyplot as plt
 
 # Leer los datos preprocesados desde el archivo JSON
-with open('preprocessed_train_data.json', 'r') as file:
+with open('Datos/preprocessed_train_data.json', 'r') as file:
     data = json.load(file)
 
 # Convertir los datos en un arreglo numpy
@@ -19,7 +19,7 @@ X_train = np.expand_dims(X_train, axis=1)
 timesteps = X_train.shape[1]
 
 # Leer las etiquetas de entrenamiento desde el archivo JSON
-with open('etiquetas_entrenamiento.json', 'r') as file:
+with open('Datos/etiquetas_entrenamiento.json', 'r') as file:
     labels = json.load(file)
 
 # Convertir las etiquetas en un arreglo numpy resultados esperados
@@ -36,12 +36,12 @@ y_train = tf.keras.utils.to_categorical(y_train, num_classes=5)
 model = Sequential()
 model.add(Conv2D(64, kernel_size=3, padding="same", activation="relu", input_shape=(X_train.shape[1], X_train.shape[2], 1)))
 model.add(Flatten())
-model.add(Dense(128, activation="tanh"))
+model.add(Dense(128, activation="sigmoid"))
 model.add(Dense(5, activation="softmax"))
 
 
 # Compilar el modelo
-model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mean_squared_error', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Entrenar el modelo
 history = model.fit(X_train, y_train, epochs=100, batch_size=64)

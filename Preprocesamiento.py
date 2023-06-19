@@ -73,8 +73,8 @@ def preprocess_data(data, mats):
     return np.array(padded_data), np.array(labels)
 
 # Ruta de los archivos de datos
-train_data_file = 'train_products.json'
-test_data_file = 'test_products.json'
+train_data_file = 'Datos/train_products.json'
+test_data_file = 'Datos/test_products.json'
 
 # Cargar los datos de entrenamiento y prueba
 train_data = load_data(train_data_file)
@@ -97,10 +97,10 @@ test_features = np.concatenate((test_features, extra_column), axis=1)
 test_features = np.array(test_features)
 
 # Rutas de los archivos de salida
-train_output_file = 'preprocessed_train_data.json'
-test_output_file = 'preprocessed_test_data.json'
-labels_output_file = 'etiquetas_entrenamiento.json'
-materiales_numericos = 'materiales_numericos.json'
+train_output_file = 'Datos/preprocessed_train_data.json'
+test_output_file = 'Datos/preprocessed_test_data.json'
+labels_output_file = 'Datos/etiquetas_entrenamiento.json'
+materiales_numericos = 'Datos/materiales_numericos.json'
 
 # Guardar los datos preprocesados de entrenamiento en un archivo JSON
 with open(train_output_file, 'w') as f:
